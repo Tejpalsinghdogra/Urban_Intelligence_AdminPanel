@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import StatCard from '../components/StatCard';
-import PotholeHeatmapSection from '../components/PotholeHeatmapSection';
+import DetectionMap from '../components/DetectionMap';
 import IncidentModal from '../components/IncidentModal';
 import { fetchDetections, fetchAdminOverview } from '../services/api';
 import { subscribeToDetections, subscribeToIncidentUpdates } from '../services/socket';
@@ -101,8 +101,13 @@ export default function Potholes() {
         />
       </div>
 
-      {/* Dedicated Pothole Heatmap */}
-      <PotholeHeatmapSection potholes={potholes} busRoute={busRoute} />
+      {/* Pothole Geospatial Intelligence Map */}
+      <DetectionMap
+        detections={potholes}
+        showHeatmapToggle={true}
+        showTypeFilter={false}
+        onSelectIncident={(item) => setSelectedIncident(item)}
+      />
 
       {/* Grid of Pothole Incident Cards */}
       <div style={{ marginTop: '2rem' }}>

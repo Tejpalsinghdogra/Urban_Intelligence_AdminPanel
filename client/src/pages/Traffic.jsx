@@ -119,8 +119,8 @@ export default function Traffic() {
       <DetectionMap
         detections={trafficDetections}
         busRoute={busRoute}
-        selectedCategory="vehicle"
         showHeatmapToggle={false}
+        showTypeFilter={false}
         onSelectIncident={(item) => setSelectedIncident(item)}
       />
 

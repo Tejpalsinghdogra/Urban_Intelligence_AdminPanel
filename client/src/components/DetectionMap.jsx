@@ -1,17 +1,38 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import HeatmapLayer from './HeatmapLayer';
 import { Layers, Flame, MapPin, Eye, Filter, Calendar } from 'lucide-react';
 
-// Auto-recenter helper
-function MapAutoRecenter({ center }) {
+// Auto-focus helper to automatically frame all report markers on load or when reports change
+function MapAutoFocus({ detections }) {
   const map = useMap();
+  const prevKeyRef = React.useRef('');
+
   useEffect(() => {
-    if (center && center[0] && center[1]) {
-      map.setView(center, 14);
+    const valid = (detections || []).filter((d) => d.lat && d.lng);
+    if (valid.length === 0) return;
+
+    const currentKey = valid.map((d) => `${d._id || ''}-${d.lat}-${d.lng}`).join('|');
+    if (currentKey === prevKeyRef.current) return;
+    prevKeyRef.current = currentKey;
+
+    map.invalidateSize();
+
+    if (valid.length === 1) {
+      map.setView([Number(valid[0].lat), Number(valid[0].lng)], 14, { animate: true });
+    } else {
+      const bounds = L.latLngBounds(valid.map((d) => [Number(d.lat), Number(d.lng)]));
+      if (bounds.isValid()) {
+        map.fitBounds(bounds, {
+          padding: [50, 50],
+          maxZoom: 14,
+          animate: true
+        });
+      }
     }
-  }, [center, map]);
+  }, [detections, map]);
+
   return null;
 }
 
@@ -60,7 +81,8 @@ export default function DetectionMap({
   onCategoryChange,
   selectedTimeRange,
   onTimeRangeChange,
-  showHeatmapToggle = true
+  showHeatmapToggle = true,
+  showTypeFilter = true
 }) {
   const [viewMode, setViewMode] = useState('markers'); // 'markers' or 'heatmap'
 
@@ -75,25 +97,6 @@ export default function DetectionMap({
     return [31.530089, 75.892554];
   }, [detections]);
 
-  // Dynamic route polyline connecting actual GPS points
-  const activeRoute = useMemo(() => {
-    if (busRoute && busRoute.length > 0) return busRoute;
-    const valid = detections.filter((d) => d.lat && d.lng).map((d) => [Number(d.lat), Number(d.lng)]);
-    if (valid.length > 1) return valid;
-    if (valid.length === 1) {
-      const [lat, lng] = valid[0];
-      return [
-        [lat - 0.002, lng - 0.002],
-        [lat, lng],
-        [lat + 0.002, lng + 0.002]
-      ];
-    }
-    return [
-      [31.528, 75.890],
-      [31.530089, 75.892554],
-      [31.532, 75.895]
-    ];
-  }, [busRoute, detections]);
 
   // Prepare heatmap points: [lat, lng, intensity]
   const heatmapPoints = useMemo(() => {
@@ -147,66 +150,70 @@ export default function DetectionMap({
       </div>
 
       {/* Filter Controls Row */}
-      <div
-        style={{
-          padding: '0.75rem 1.25rem',
-          backgroundColor: '#f8fafc',
-          borderBottom: '1px solid #e2e8f0',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '0.75rem'
-        }}
-      >
-        {/* Category Filters */}
-        <div className="filter-bar">
-          <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <Filter size={13} /> TYPE:
-          </span>
-          {['all', 'pothole', 'vehicle', 'pedestrian', 'traffic_light'].map((cat) => {
-            const labels = {
-              all: 'All Intelligence',
-              pothole: 'Potholes (Red)',
-              vehicle: 'Traffic & Vehicles (Blue)',
-              pedestrian: 'Pedestrians (Green)',
-              traffic_light: 'Traffic Lights (Amber)'
-            };
-            return (
-              <button
-                key={cat}
-                className={`filter-btn ${selectedCategory === cat ? 'active' : ''}`}
-                onClick={() => onCategoryChange && onCategoryChange(cat)}
-              >
-                {labels[cat]}
-              </button>
-            );
-          })}
-        </div>
+      {Boolean((showTypeFilter && onCategoryChange) || onTimeRangeChange) && (
+        <div
+          style={{
+            padding: '0.75rem 1.25rem',
+            backgroundColor: '#f8fafc',
+            borderBottom: '1px solid #e2e8f0',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '0.75rem'
+          }}
+        >
+          {/* Category Filters */}
+          {showTypeFilter && onCategoryChange && (
+            <div className="filter-bar">
+              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <Filter size={13} /> TYPE:
+              </span>
+              {['all', 'pothole', 'vehicle', 'pedestrian', 'traffic_light'].map((cat) => {
+                const labels = {
+                  all: 'All Intelligence',
+                  pothole: 'Potholes (Red)',
+                  vehicle: 'Traffic & Vehicles (Blue)',
+                  pedestrian: 'Pedestrians (Green)',
+                  traffic_light: 'Traffic Lights (Amber)'
+                };
+                return (
+                  <button
+                    key={cat}
+                    className={`filter-btn ${selectedCategory === cat ? 'active' : ''}`}
+                    onClick={() => onCategoryChange && onCategoryChange(cat)}
+                  >
+                    {labels[cat]}
+                  </button>
+                );
+              })}
+            </div>
+          )}
 
-        {/* Time Range Filters */}
-        {onTimeRangeChange && (
-          <div className="filter-bar">
-            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <Calendar size={13} /> PERIOD:
-            </span>
-            {[
-              { id: 'all', label: 'All Records' },
-              { id: 'today', label: 'Today' },
-              { id: '7days', label: 'Last 7 Days' },
-              { id: '30days', label: 'Last 30 Days' }
-            ].map((period) => (
-              <button
-                key={period.id}
-                className={`filter-btn ${selectedTimeRange === period.id ? 'active' : ''}`}
-                onClick={() => onTimeRangeChange(period.id)}
-              >
-                {period.label}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+          {/* Time Range Filters */}
+          {onTimeRangeChange && (
+            <div className="filter-bar">
+              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <Calendar size={13} /> PERIOD:
+              </span>
+              {[
+                { id: 'all', label: 'All Records' },
+                { id: 'today', label: 'Today' },
+                { id: '7days', label: 'Last 7 Days' },
+                { id: '30days', label: 'Last 30 Days' }
+              ].map((period) => (
+                <button
+                  key={period.id}
+                  className={`filter-btn ${selectedTimeRange === period.id ? 'active' : ''}`}
+                  onClick={() => onTimeRangeChange(period.id)}
+                >
+                  {period.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Map Container */}
       <div className="map-container-wrapper">
@@ -221,20 +228,8 @@ export default function DetectionMap({
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
 
-          <MapAutoRecenter center={mapCenter} />
+          <MapAutoFocus detections={detections} />
 
-          {/* Bus Fleet Route Polyline */}
-          {activeRoute && activeRoute.length > 0 && (
-            <Polyline
-              positions={activeRoute}
-              pathOptions={{
-                color: '#4f46e5',
-                weight: 4,
-                dashArray: '8, 8',
-                opacity: 0.85
-              }}
-            />
-          )}
 
           {/* Heatmap Layer View */}
           {viewMode === 'heatmap' && heatmapPoints.length > 0 && (
@@ -329,10 +324,6 @@ export default function DetectionMap({
           <div className="legend-item">
             <span className="legend-dot signal"></span>
             <span>Traffic Light</span>
-          </div>
-          <div className="legend-item">
-            <span className="legend-dot route"></span>
-            <span>Fleet Transit Bus Route</span>
           </div>
         </div>
         <div>

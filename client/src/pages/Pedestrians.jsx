@@ -116,8 +116,8 @@ export default function Pedestrians() {
       <DetectionMap
         detections={pedestrianDetections}
         busRoute={busRoute}
-        selectedCategory="pedestrian"
         showHeatmapToggle={false}
+        showTypeFilter={false}
         onSelectIncident={(item) => setSelectedIncident(item)}
       />
 

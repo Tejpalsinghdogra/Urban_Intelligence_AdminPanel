@@ -1,15 +1,37 @@
-import React, { useMemo, useEffect } from 'react';
-import { MapContainer, TileLayer, Polyline, useMap } from 'react-leaflet';
+import React, { useMemo, useEffect, useRef } from 'react';
+import { MapContainer, TileLayer, useMap } from 'react-leaflet';
+import L from 'leaflet';
 import HeatmapLayer from './HeatmapLayer';
 import { Flame, AlertCircle } from 'lucide-react';
 
-function MapAutoRecenter({ center }) {
+function MapAutoFocus({ potholes }) {
   const map = useMap();
+  const prevKeyRef = useRef('');
+
   useEffect(() => {
-    if (center && center[0] && center[1]) {
-      map.setView(center, 14);
+    const valid = (potholes || []).filter((p) => p.lat && p.lng);
+    if (valid.length === 0) return;
+
+    const currentKey = valid.map((p) => `${p._id || ''}-${p.lat}-${p.lng}`).join('|');
+    if (currentKey === prevKeyRef.current) return;
+    prevKeyRef.current = currentKey;
+
+    map.invalidateSize();
+
+    if (valid.length === 1) {
+      map.setView([Number(valid[0].lat), Number(valid[0].lng)], 14, { animate: true });
+    } else {
+      const bounds = L.latLngBounds(valid.map((p) => [Number(p.lat), Number(p.lng)]));
+      if (bounds.isValid()) {
+        map.fitBounds(bounds, {
+          padding: [50, 50],
+          maxZoom: 14,
+          animate: true
+        });
+      }
     }
-  }, [center, map]);
+  }, [potholes, map]);
+
   return null;
 }
 
@@ -71,19 +93,8 @@ export default function PotholeHeatmapSection({ potholes = [], busRoute = [] }) 
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
 
-          <MapAutoRecenter center={mapCenter} />
+          <MapAutoFocus potholes={potholes} />
 
-          {busRoute && busRoute.length > 0 && (
-            <Polyline
-              positions={busRoute}
-              pathOptions={{
-                color: '#4f46e5',
-                weight: 3,
-                dashArray: '6, 6',
-                opacity: 0.7
-              }}
-            />
-          )}
 
           {heatPoints.length > 0 && (
             <HeatmapLayer
