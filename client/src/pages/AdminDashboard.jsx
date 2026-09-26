@@ -135,7 +135,7 @@ export default function AdminDashboard() {
         <StatCard
           title="Total Incidents"
           value={overview?.stats?.totalDetections ?? 58}
-          subtext="All fleet AI detections"
+          subtext="All UrbanSightAi detections"
           trend="Active transit stream"
           icon={Activity}
           color="#8b5cf6"
@@ -152,8 +152,8 @@ export default function AdminDashboard() {
 
         <StatCard
           title="Concerned Authorities"
-          value="3"
-          subtext="Multi-agency dispatch"
+          value={authorities.length || 9}
+          subtext="ICCC multi-agency dispatch"
           trend="Auto-routed"
           icon={ShieldCheck}
           color="#0f172a"
@@ -182,10 +182,10 @@ export default function AdminDashboard() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
           <div>
             <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#0f172a' }}>
-              Multi-Agency Authority Dispatch Pipelines
+              ICCC Multi-Agency Authority Dispatch Pipelines
             </h3>
             <p style={{ fontSize: '0.8rem', color: '#64748b' }}>
-              AI system continuously redirects detections to respective municipal response departments
+              Integrated Command and Control Centre (ICCC) automatically directs detections to designated road authorities
             </p>
           </div>
         </div>

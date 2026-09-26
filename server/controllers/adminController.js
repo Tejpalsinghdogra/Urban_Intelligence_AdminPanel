@@ -1,5 +1,6 @@
 import Detection from '../models/Detection.js';
 import { routeDetection } from '../services/authorityRouter.js';
+import { AUTHORITIES_META } from './authorityController.js';
 
 export async function getOverview(req, res) {
   try {
@@ -31,7 +32,7 @@ export async function getOverview(req, res) {
     const resolvedCount = detections.filter((d) => d.routingStatus === 'resolved').length;
 
     // Authority breakdowns
-    const authorities = ['Road Safety Department', 'Traffic Police', 'Police'];
+    const authorities = AUTHORITIES_META.map((a) => a.name);
     const authorityBreakdown = authorities.map((authName) => {
       const assignedDets = detections.filter((d) => d.authority === authName);
       const total = assignedDets.length;

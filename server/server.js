@@ -72,43 +72,45 @@ app.get('/', (req, res) => {
  */
 async function syncDatabase() {
   try {
-    // Seed Authorities metadata if empty
-    const authCount = await Authority.countDocuments();
-    if (authCount === 0) {
-      console.log('[Init] Seeding Authorities metadata...');
-      for (const auth of AUTHORITIES_META) {
-        await Authority.create({
+    console.log('[Init] Synchronizing Authorities metadata for 9 road departments...');
+    for (const auth of AUTHORITIES_META) {
+      await Authority.findOneAndUpdate(
+        { code: auth.code },
+        {
           name: auth.name,
           code: auth.code,
           description: auth.description,
           color: auth.color,
           icon: auth.icon,
           categories: auth.categories
-        });
-      }
-      console.log('[Init] Authorities metadata initialized.');
+        },
+        { upsert: true, new: true }
+      );
     }
-
-    // Backfill any existing un-routed detections in Atlas
-    const unrouted = await Detection.find({
-      $or: [{ authority: { $exists: false } }, { authority: null }, { routingStatus: { $exists: false } }]
+    // Remove old legacy 3 authorities if present
+    await Authority.deleteMany({
+      code: { $nin: AUTHORITIES_META.map((a) => a.code) }
     });
+    console.log('[Init] 9 Road Authorities metadata successfully synchronized.');
 
-    if (unrouted.length > 0) {
-      console.log(`[Init] Backfilling ${unrouted.length} real detections with authority routing rules...`);
-      for (const doc of unrouted) {
-        const routed = routeDetection(doc);
+    // Map and update existing detections to the 9 road departments
+    const allDetections = await Detection.find();
+    console.log(`[Init] Checking and updating ${allDetections.length} detections for 9 road departments...`);
+    let updatedCount = 0;
+    for (const doc of allDetections) {
+      const routed = routeDetection(doc);
+      if (doc.authority !== routed.authority || doc.roadType !== routed.roadType || !doc.locationName) {
         doc.authority = routed.authority;
-        doc.priority = routed.priority;
-        doc.routingStatus = routed.routingStatus;
+        doc.roadType = routed.roadType;
         doc.locationName = routed.locationName;
+        doc.priority = routed.priority;
+        doc.routingStatus = doc.routingStatus || routed.routingStatus;
         doc.congestionLevel = routed.congestionLevel;
-        if (routed.vehicleCount) doc.vehicleCount = routed.vehicleCount;
-        if (routed.pedestrianCount) doc.pedestrianCount = routed.pedestrianCount;
         await doc.save();
+        updatedCount++;
       }
-      console.log('[Init] Real detections successfully routed and saved to Atlas.');
     }
+    console.log(`[Init] Successfully synchronized ${updatedCount} detections across the 9 road departments.`);
   } catch (err) {
     console.error('[Init] Error during database synchronization:', err.message);
   }

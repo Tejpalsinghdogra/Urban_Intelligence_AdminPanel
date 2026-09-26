@@ -158,6 +158,13 @@ export default function IncidentModal({ incident, onClose, onStatusUpdated }) {
             </div>
 
             <div>
+              <span style={{ color: '#64748b', fontSize: '0.75rem', display: 'block' }}>ROAD / HIGHWAY TYPE</span>
+              <strong style={{ color: '#0f172a' }}>
+                {incident.roadType || 'National Highways (NH)'}
+              </strong>
+            </div>
+
+            <div>
               <span style={{ color: '#64748b', fontSize: '0.75rem', display: 'block' }}>ROUTING STATUS</span>
               <span className={`badge badge-${currentStatus.toLowerCase()}`} style={{ marginTop: '4px' }}>
                 {currentStatus.toUpperCase()}

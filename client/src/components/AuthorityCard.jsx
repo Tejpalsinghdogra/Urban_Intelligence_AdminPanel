@@ -1,62 +1,122 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowRight, AlertTriangle, Car, Users, Lock, LogIn } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import {
+  Milestone,
+  Compass,
+  Truck,
+  Layers,
+  Trees,
+  Building2,
+  Zap,
+  RotateCw,
+  Split,
+  Shield
+} from 'lucide-react';
+
+const ICON_MAP = {
+  Milestone,
+  Compass,
+  Truck,
+  Layers,
+  Trees,
+  Building2,
+  Zap,
+  RotateCw,
+  Split
+};
 
 export default function AuthorityCard({ authority }) {
-  const { isDepartmentAuthenticated } = useAuth();
-  const { name, code, description, stats = {}, color = '#2563eb', categories = [] } = authority;
+  const {
+    id,
+    name,
+    code,
+    description,
+    stats = {},
+    color = '#2563eb',
+    categories = [],
+    icon
+  } = authority;
 
-  let classNameSuffix = 'road-safety';
-  let Icon = AlertTriangle;
-  let deptSlug = 'road-safety';
-
-  if (name.toLowerCase().includes('traffic')) {
-    classNameSuffix = 'traffic-police';
-    Icon = Car;
-    deptSlug = 'traffic-police';
-  } else if (name.toLowerCase().includes('police')) {
-    classNameSuffix = 'police';
-    Icon = Users;
-    deptSlug = 'police';
-  }
-
-  // Determine link target
-  let targetLink = '/admin/incidents?authority=' + encodeURIComponent(name);
-  if (name.includes('Road Safety')) targetLink = '/admin/potholes';
-  else if (name.includes('Traffic Police')) targetLink = '/admin/traffic';
-  else if (name.includes('Police')) targetLink = '/admin/pedestrians';
-
-  const isAuth = isDepartmentAuthenticated(deptSlug);
+  const Icon = ICON_MAP[icon] || Shield;
 
   return (
-    <div className={`authority-card ${classNameSuffix}`}>
+    <div
+      className="authority-card"
+      style={{
+        borderLeft: `4px solid ${color}`,
+        position: 'relative'
+      }}
+    >
+      {/* Header: Icon, Name, Category tags and Code badge */}
       <div className="authority-card-header">
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.25rem' }}>
-            <Icon size={16} color={color} />
-            <h4 className="authority-name">{name}</h4>
+        <div style={{ flex: 1, minWidth: 0, paddingRight: '0.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '0.2rem' }}>
+            <Icon size={18} color={color} style={{ marginTop: '2px', flexShrink: 0 }} />
+            <h4
+              className="authority-name"
+              style={{
+                fontSize: '0.92rem',
+                fontWeight: 600,
+                lineHeight: 1.35,
+                color: '#0f172a'
+              }}
+            >
+              {name}
+            </h4>
           </div>
-          <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
-            {categories.join(', ')}
+          <span
+            style={{
+              fontSize: '0.72rem',
+              color: '#64748b',
+              display: 'block',
+              paddingLeft: '1.6rem',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis'
+            }}
+          >
+            {categories.slice(0, 2).join(' • ')}
           </span>
         </div>
-        <span className="authority-code">{code || 'DEPT'}</span>
+        <span
+          className="authority-code"
+          style={{
+            backgroundColor: `${color}15`,
+            color: color,
+            borderColor: `${color}35`,
+            flexShrink: 0,
+            alignSelf: 'flex-start'
+          }}
+        >
+          {code || 'DEPT'}
+        </span>
       </div>
 
-      <div style={{ fontSize: '0.8rem', color: '#475569', marginBottom: '1rem', minHeight: '36px' }}>
+      {/* Description with aligned minHeight */}
+      <div
+        style={{
+          fontSize: '0.78rem',
+          color: '#475569',
+          marginBottom: '0.75rem',
+          minHeight: '2.5rem',
+          lineHeight: 1.45
+        }}
+      >
         {description}
       </div>
 
-      {/* Incident Status Breakdown */}
+      {/* 4-Column Incident Pipeline Metrics */}
       <div className="authority-stats-row">
         <div className="auth-stat-box">
-          <div className="num" style={{ color: '#b45309' }}>{stats.pending || 0}</div>
-          <div className="lbl">Active / Routed</div>
+          <div className="num" style={{ color: '#0f172a' }}>{stats.assigned || 0}</div>
+          <div className="lbl">Total</div>
         </div>
         <div className="auth-stat-box">
-          <div className="num" style={{ color: '#6d28d9' }}>{stats.acknowledged || 0}</div>
-          <div className="lbl">Acknowledged</div>
+          <div className="num" style={{ color: '#b45309' }}>{stats.pending || 0}</div>
+          <div className="lbl">Active</div>
+        </div>
+        <div className="auth-stat-box">
+          <div className="num" style={{ color: '#2563eb' }}>{stats.acknowledged || 0}</div>
+          <div className="lbl">Progress</div>
         </div>
         <div className="auth-stat-box">
           <div className="num" style={{ color: '#15803d' }}>{stats.resolved || 0}</div>
@@ -64,41 +124,49 @@ export default function AuthorityCard({ authority }) {
         </div>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '0.75rem', gap: '0.5rem' }}>
-        <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#0f172a' }}>
-          Total Routed: <strong>{stats.assigned || 0}</strong>
+      {/* Footer: Jurisdiction & Auto-Routing Live Status */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          paddingTop: '0.5rem',
+          marginTop: 'auto',
+          fontSize: '0.75rem'
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#64748b', fontSize: '0.74rem' }}>
+          <span>Jurisdiction:</span>
+          <span style={{ fontWeight: 600, color: '#334155' }}>
+            {categories[0] || 'Corridor'}
+          </span>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-          {!isAuth && (
-            <Link
-              to={`/department/login?dept=${deptSlug}&redirect=${encodeURIComponent(targetLink)}`}
-              className="btn btn-secondary"
-              style={{ padding: '0.35rem 0.55rem', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '3px' }}
-              title={`Login as ${name}`}
-            >
-              <Lock size={12} />
-              <span>Login</span>
-            </Link>
-          )}
-
-          <Link
-            to={targetLink}
-            className="btn"
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.35rem',
+            fontSize: '0.68rem',
+            fontWeight: 600,
+            color: '#15803d',
+            backgroundColor: '#f0fdf4',
+            padding: '0.2rem 0.55rem',
+            borderRadius: '999px',
+            border: '1px solid #dcfce7',
+            flexShrink: 0
+          }}
+        >
+          <span
             style={{
-              padding: '0.35rem 0.75rem',
-              fontSize: '0.78rem',
-              backgroundColor: color,
-              color: '#ffffff',
-              border: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px'
+              width: '6px',
+              height: '6px',
+              borderRadius: '50%',
+              backgroundColor: '#22c55e',
+              display: 'inline-block'
             }}
-          >
-            <span>{isAuth ? 'Open Portal' : 'Access Portal'}</span>
-            <ArrowRight size={14} />
-          </Link>
+          />
+          <span>Auto-Routed</span>
         </div>
       </div>
     </div>

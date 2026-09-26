@@ -114,10 +114,16 @@ export default function DetectionTable({
                 border: '1px solid #cbd5e1'
               }}
             >
-              <option value="all">All Authorities</option>
-              <option value="Road Safety Department">Road Safety Dept</option>
-              <option value="Traffic Police">Traffic Police</option>
-              <option value="Police">Police</option>
+              <option value="all">All Road Authorities</option>
+              <option value="National Highways (NH) - NHAI">National Highways (NH) - NHAI</option>
+              <option value="State Highways (SH) - State PWD">State Highways (SH) - State PWD</option>
+              <option value="Major District Roads (MDR) - District PWD">Major District Roads (MDR)</option>
+              <option value="Other District Roads (ODR) - Zilla Parishad">Other District Roads (ODR)</option>
+              <option value="Village / Rural Roads - PMGSY">Village / Rural Roads - PMGSY</option>
+              <option value="City / Municipal Roads - Municipal Corp">City / Municipal Roads</option>
+              <option value="Expressways - Expressway Authority">Expressways - Expressway Authority</option>
+              <option value="Ring roads / bypasses - Urban Dev Authority">Ring roads / bypasses</option>
+              <option value="Service roads along NH - NHAI Service Wing">Service roads along NH</option>
             </select>
 
             {/* Status Filter */}
@@ -237,9 +243,16 @@ export default function DetectionTable({
                   </td>
 
                   <td>
-                    <strong style={{ fontSize: '0.8rem', color: '#1e3a8a' }}>
-                      {item.authority}
-                    </strong>
+                    <div style={{ maxWidth: '220px' }}>
+                      <strong style={{ fontSize: '0.8rem', color: '#1e3a8a', display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={item.authority}>
+                        {item.authority}
+                      </strong>
+                      {item.roadType && (
+                        <span style={{ fontSize: '0.68rem', color: '#64748b' }}>
+                          {item.roadType}
+                        </span>
+                      )}
+                    </div>
                   </td>
 
                   <td>

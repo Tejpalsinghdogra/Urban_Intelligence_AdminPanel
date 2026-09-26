@@ -1,53 +1,176 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 export const DEPARTMENTS = {
-  'road-safety': {
-    id: 'road-safety',
-    name: 'Road Safety Department',
-    code: 'RSD-01',
-    color: '#dc2626',
-    icon: 'Hammer',
-    path: '/admin/potholes',
-    officer: 'Er. R. Sharma',
-    designation: 'Executive Engineer (Pavement & Road Maintenance)',
-    division: 'Municipal Infrastructure & Public Works',
-    credentials: {
-      username: 'roadsafety',
-      password: 'safe123'
-    },
-    allowedCategories: ['Potholes', 'Road Defect', 'Cracks']
-  },
-  'traffic-police': {
-    id: 'traffic-police',
-    name: 'Traffic Police',
-    code: 'TPC-02',
+  'national-highways': {
+    id: 'national-highways',
+    name: 'National Highways (NH) - NHAI',
+    shortName: 'National Highways (NH)',
+    agency: 'National Highways Authority of India (NHAI)',
+    code: 'NHAI-NH',
+    roadType: 'National Highways (NH)',
     color: '#2563eb',
-    icon: 'Car',
-    path: '/admin/traffic',
-    officer: 'ACP Harpreet Singh',
-    designation: 'Assistant Commissioner of Police (Traffic)',
-    division: 'Urban Mobility & Traffic Enforcement Division',
+    icon: 'Milestone',
+    path: '/admin/department/national-highways',
+    officer: 'Er. A. K. Verma',
+    designation: 'Project Director (National Highway Corridors)',
+    division: 'MoRTH & NHAI Regional Highway Operations',
     credentials: {
-      username: 'traffic',
-      password: 'traffic123'
+      username: 'nhai',
+      password: 'nh123'
     },
-    allowedCategories: ['Vehicles', 'Congestion', 'Traffic Light Status']
+    allowedCategories: ['National Highway Defect', 'Crater / Pothole', 'Freight Corridor Rutting', 'Road Defect']
   },
-  'police': {
-    id: 'police',
-    name: 'Police (Public Safety)',
-    code: 'PCC-03',
-    color: '#16a34a',
-    icon: 'Shield',
-    path: '/admin/pedestrians',
-    officer: 'Inspector Gurpreet Kaur',
-    designation: 'SHO & Crowd Surveillance Wing Head',
-    division: 'Transit Perimeter Safety & Public Order',
+  'state-highways': {
+    id: 'state-highways',
+    name: 'State Highways (SH) - State PWD',
+    shortName: 'State Highways (SH)',
+    agency: 'Public Works Department (State PWD)',
+    code: 'PWD-SH',
+    roadType: 'State Highways (SH)',
+    color: '#7c3aed',
+    icon: 'Compass',
+    path: '/admin/department/state-highways',
+    officer: 'Er. S. P. Chawla',
+    designation: 'Superintending Engineer (State Highways Circle)',
+    division: 'State Infrastructure & Inter-District Highways',
     credentials: {
-      username: 'police',
-      password: 'police123'
+      username: 'pwdsh',
+      password: 'sh123'
     },
-    allowedCategories: ['Pedestrian Density', 'Public Safety', 'Crowd Surveillance']
+    allowedCategories: ['State Highway Pavement', 'Edge Erosion', 'Asphalt Cracks', 'Road Defect']
+  },
+  'major-district-roads': {
+    id: 'major-district-roads',
+    name: 'Major District Roads (MDR) - District PWD',
+    shortName: 'Major District Roads (MDR)',
+    agency: 'District PWD & Infrastructure Board',
+    code: 'PWD-MDR',
+    roadType: 'Major District Roads (MDR)',
+    color: '#0284c7',
+    icon: 'Truck',
+    path: '/admin/department/major-district-roads',
+    officer: 'Er. Manjit Singh',
+    designation: 'Executive Engineer (MDR Division)',
+    division: 'District Connectivity & Arterial Corridors',
+    credentials: {
+      username: 'pwdmdr',
+      password: 'mdr123'
+    },
+    allowedCategories: ['MDR Pavement Defects', 'Market Corridor Potholes', 'Structural Cracking']
+  },
+  'other-district-roads': {
+    id: 'other-district-roads',
+    name: 'Other District Roads (ODR) - Zilla Parishad',
+    shortName: 'Other District Roads (ODR)',
+    agency: 'Zilla Parishad & Rural Infrastructure Development',
+    code: 'ZP-ODR',
+    roadType: 'Other District Roads (ODR)',
+    color: '#0d9488',
+    icon: 'Layers',
+    path: '/admin/department/other-district-roads',
+    officer: 'Er. Neha Gupta',
+    designation: 'Assistant Executive Engineer (ODR Wing)',
+    division: 'Sub-Divisional & Rural-Urban Connectors',
+    credentials: {
+      username: 'zpodr',
+      password: 'odr123'
+    },
+    allowedCategories: ['Secondary District Road Defect', 'Sub-division Potholes', 'Surface Erosion']
+  },
+  'village-rural-roads': {
+    id: 'village-rural-roads',
+    name: 'Village / Rural Roads - PMGSY',
+    shortName: 'Village / Rural Roads',
+    agency: 'Panchayati Raj & PMGSY (Pradhan Mantri Gram Sadak Yojana)',
+    code: 'PMGSY-VR',
+    roadType: 'Village / Rural Roads',
+    color: '#16a34a',
+    icon: 'Trees',
+    path: '/admin/department/village-rural-roads',
+    officer: 'Er. Rajesh Dogra',
+    designation: 'Nodal Technical Officer (PMGSY)',
+    division: 'Rural Road Connectivity & Panchayat Infrastructure',
+    credentials: {
+      username: 'pmgsy',
+      password: 'rural123'
+    },
+    allowedCategories: ['Rural Pavement Failure', 'All-weather Road Defects', 'Panchayat Corridor Potholes']
+  },
+  'city-municipal-roads': {
+    id: 'city-municipal-roads',
+    name: 'City / Municipal Roads - Municipal Corp',
+    shortName: 'City / Municipal Roads',
+    agency: 'Municipal Corporation (MC / Urban Local Bodies)',
+    code: 'MC-CMR',
+    roadType: 'City / Municipal Roads',
+    color: '#ea580c',
+    icon: 'Building2',
+    path: '/admin/department/city-municipal-roads',
+    officer: 'Er. R. Sharma',
+    designation: 'Chief Municipal Engineer (Roads & B&R)',
+    division: 'Urban Roads, Pavements & Stormwater Repair',
+    credentials: {
+      username: 'municipal',
+      password: 'city123'
+    },
+    allowedCategories: ['Urban Potholes', 'Drainage Subsidence', 'Crosswalk & Intersection Defects']
+  },
+  'expressways': {
+    id: 'expressways',
+    name: 'Expressways - Expressway Authority',
+    shortName: 'Expressways',
+    agency: 'Expressway Development Authority / NHAI (NEAD)',
+    code: 'EDA-EXP',
+    roadType: 'Expressways',
+    color: '#dc2626',
+    icon: 'Zap',
+    path: '/admin/department/expressways',
+    officer: 'Er. Vikram Malhotra',
+    designation: 'General Manager (Technical - Expressway Corridor)',
+    division: 'High-Speed Access Controlled Highway Maintenance',
+    credentials: {
+      username: 'expressway',
+      password: 'exp123'
+    },
+    allowedCategories: ['High-Speed Lane Hazards', 'Expressway Pavement Fissures', 'Rapid Emergency Repairs']
+  },
+  'ring-roads-bypasses': {
+    id: 'ring-roads-bypasses',
+    name: 'Ring roads / bypasses - Urban Dev Authority',
+    shortName: 'Ring roads / bypasses',
+    agency: 'Urban Development Authority (UDA / Ring Road Division)',
+    code: 'UDA-RRB',
+    roadType: 'Ring roads / bypasses',
+    color: '#d97706',
+    icon: 'RotateCw',
+    path: '/admin/department/ring-roads-bypasses',
+    officer: 'Er. Hardeep Sandhu',
+    designation: 'Divisional Engineer (Circumferential & Bypass Network)',
+    division: 'Heavy Transit Diversion & Ring Road Infrastructure',
+    credentials: {
+      username: 'ringroad',
+      password: 'ring123'
+    },
+    allowedCategories: ['Bypass Pavement Subsidence', 'Circumferential Highway Defects', 'Heavy Vehicle Rutting']
+  },
+  'service-roads-nh': {
+    id: 'service-roads-nh',
+    name: 'Service roads along NH - NHAI Service Wing',
+    shortName: 'Service roads along NH',
+    agency: 'NHAI Service Corridor & Concessionaire Division',
+    code: 'NHAI-SR',
+    roadType: 'Service roads along NH',
+    color: '#4f46e5',
+    icon: 'Split',
+    path: '/admin/department/service-roads-nh',
+    officer: 'Er. Priya Nair',
+    designation: 'Resident Engineer (Service Corridor & Access Ops)',
+    division: 'National Highway Toll & Lateral Service Road Network',
+    credentials: {
+      username: 'serviceroad',
+      password: 'service123'
+    },
+    allowedCategories: ['Lateral Service Lane Potholes', 'Toll Plaza Approach Defects', 'Slip Road Erosion']
   }
 };
 

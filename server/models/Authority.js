@@ -5,8 +5,7 @@ const authoritySchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
-      unique: true,
-      enum: ['Road Safety Department', 'Traffic Police', 'Police']
+      unique: true
     },
     code: {
       type: String,

@@ -61,10 +61,10 @@ export default function Incidents() {
       {/* Header */}
       <div style={{ marginBottom: '1.5rem' }}>
         <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#0f172a' }}>
-          Urban Incidents & Multi-Agency Dispatch Registry
+          ICCC Urban Incidents & Multi-Agency Dispatch Registry
         </h2>
         <p style={{ fontSize: '0.85rem', color: '#64748b' }}>
-          Consolidated repository of all automated detections with status tracking and lifecycle management
+          Integrated Command & Control Centre (ICCC) consolidated repository of automated detections with lifecycle tracking
         </p>
       </div>
 

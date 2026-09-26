@@ -49,9 +49,13 @@ const detectionSchema = new mongoose.Schema(
       enum: ['LOW', 'MEDIUM', 'HIGH'],
       default: 'LOW'
     },
+    roadType: {
+      type: String,
+      default: 'National Highways (NH)',
+      index: true
+    },
     authority: {
       type: String,
-      enum: ['Road Safety Department', 'Traffic Police', 'Police'],
       index: true
     },
     priority: {

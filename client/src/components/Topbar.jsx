@@ -26,10 +26,12 @@ export default function Topbar() {
   return (
     <header className="topbar">
       <div className="topbar-left">
-        <div>
-          <h2 className="topbar-heading">UrbanSight Command Center</h2>
-          <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
-            AI-Driven Fleet Sensor Analytics & Multi-Agency Dispatch
+        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '3px' }}>
+          <h2 className="topbar-heading" style={{ margin: 0, padding: 0, lineHeight: 1.25 }}>
+            UrbanSight ICCC Command Center
+          </h2>
+          <span className="topbar-subheading" style={{ fontSize: '0.74rem', color: '#64748b', lineHeight: 1.2, margin: 0 }}>
+            Integrated Command and Control Centre (ICCC) • Multi-Agency Autonomous Dispatch
           </span>
         </div>
       </div>
@@ -44,7 +46,7 @@ export default function Topbar() {
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '0.5rem',
+            gap: '0.55rem',
             paddingLeft: '0.75rem',
             borderLeft: '1px solid #e2e8f0',
             fontSize: '0.85rem',
@@ -54,21 +56,26 @@ export default function Topbar() {
         >
           <div
             style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '50%',
+              width: '34px',
+              height: '34px',
+              borderRadius: '8px',
               backgroundColor: '#0f172a',
-              color: '#fff',
+              color: '#38bdf8',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontWeight: 600,
-              fontSize: '0.75rem'
+              fontWeight: 800,
+              fontSize: '0.68rem',
+              letterSpacing: '0.5px',
+              border: '1px solid #334155'
             }}
           >
-            ADM
+            ICCC
           </div>
-          <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>Authority Admin</span>
+          <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.15 }}>
+            <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#0f172a' }}>ICCC Command</span>
+            <span style={{ fontSize: '0.65rem', color: '#64748b' }}>Central Operations</span>
+          </div>
         </div>
       </div>
     </header>

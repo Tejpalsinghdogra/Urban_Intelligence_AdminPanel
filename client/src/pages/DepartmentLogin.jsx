@@ -2,40 +2,55 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth, DEPARTMENTS } from '../context/AuthContext';
 import {
+  Milestone,
+  Compass,
+  Truck,
+  Layers,
+  Trees,
+  Building2,
+  Zap,
+  RotateCw,
+  Split,
   Shield,
-  AlertTriangle,
-  Car,
-  Users,
   Lock,
   User,
   ArrowRight,
   ArrowLeft,
-  Building2,
   CheckCircle2,
   AlertCircle,
-  KeyRound,
-  Zap
+  KeyRound
 } from 'lucide-react';
+
+const ICON_MAP = {
+  Milestone,
+  Compass,
+  Truck,
+  Layers,
+  Trees,
+  Building2,
+  Zap,
+  RotateCw,
+  Split
+};
 
 export default function DepartmentLogin() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { loginDepartment, instantDemoLogin, activeDepartment } = useAuth();
 
-  const requestedDept = searchParams.get('dept') || 'road-safety';
+  const requestedDept = searchParams.get('dept') || 'national-highways';
   const redirectPath = searchParams.get('redirect');
 
   const [selectedDeptId, setSelectedDeptId] = useState(
-    DEPARTMENTS[requestedDept] ? requestedDept : 'road-safety'
+    DEPARTMENTS[requestedDept] ? requestedDept : 'national-highways'
   );
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const currentDept = DEPARTMENTS[selectedDeptId] || DEPARTMENTS['road-safety'];
+  const currentDept = DEPARTMENTS[selectedDeptId] || DEPARTMENTS['national-highways'];
 
-  // Update default username placeholder when department switches
   useEffect(() => {
     if (DEPARTMENTS[requestedDept]) {
       setSelectedDeptId(requestedDept);
@@ -43,9 +58,11 @@ export default function DepartmentLogin() {
   }, [requestedDept]);
 
   useEffect(() => {
-    setUsername(currentDept.credentials.username);
-    setPassword('');
-    setError(null);
+    if (currentDept?.credentials) {
+      setUsername(currentDept.credentials.username);
+      setPassword('');
+      setError(null);
+    }
   }, [selectedDeptId, currentDept]);
 
   const handleDepartmentSwitch = (id) => {
@@ -81,20 +98,7 @@ export default function DepartmentLogin() {
     }
   };
 
-  const getDeptIcon = (id) => {
-    switch (id) {
-      case 'road-safety':
-        return AlertTriangle;
-      case 'traffic-police':
-        return Car;
-      case 'police':
-        return Users;
-      default:
-        return Building2;
-    }
-  };
-
-  const IconComponent = getDeptIcon(currentDept.id);
+  const IconComponent = ICON_MAP[currentDept.icon] || Shield;
 
   return (
     <div
@@ -105,7 +109,7 @@ export default function DepartmentLogin() {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: '2rem 1rem',
+        padding: '2.5rem 1rem',
         backgroundImage: 'radial-gradient(ellipse at top, #1e293b 0%, #0f172a 100%)',
         position: 'relative'
       }}
@@ -122,12 +126,14 @@ export default function DepartmentLogin() {
             display: 'flex',
             alignItems: 'center',
             gap: '0.4rem',
-            padding: '0.45rem 0.85rem',
-            fontSize: '0.8rem'
+            padding: '0.5rem 0.85rem',
+            borderRadius: '6px',
+            textDecoration: 'none',
+            fontSize: '0.82rem'
           }}
         >
-          <ArrowLeft size={15} />
-          <span>Back to Central Command Admin</span>
+          <ArrowLeft size={16} />
+          <span>Back to ICCC Command Center</span>
         </Link>
       </div>
 
@@ -135,10 +141,10 @@ export default function DepartmentLogin() {
       <div
         style={{
           width: '100%',
-          maxWidth: '520px',
+          maxWidth: '680px',
           backgroundColor: '#ffffff',
-          borderRadius: '12px',
-          boxShadow: '0 20px 40px -15px rgba(0,0,0,0.5)',
+          borderRadius: '14px',
+          boxShadow: '0 25px 50px -12px rgba(0,0,0,0.6)',
           overflow: 'hidden',
           border: '1px solid #e2e8f0'
         }}
@@ -148,7 +154,7 @@ export default function DepartmentLogin() {
           style={{
             backgroundColor: currentDept.color,
             color: '#ffffff',
-            padding: '1.75rem 2rem',
+            padding: '1.5rem 2rem',
             position: 'relative',
             transition: 'background-color 0.25s ease'
           }}
@@ -167,25 +173,26 @@ export default function DepartmentLogin() {
               {currentDept.code}
             </span>
             <span style={{ fontSize: '0.75rem', opacity: 0.9 }}>
-              UrbanSight Authority Gateway
+              UrbanSight ICCC Road Authority Gateway
             </span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
             <div
               style={{
-                width: '42px',
-                height: '42px',
+                width: '46px',
+                height: '46px',
                 borderRadius: '10px',
                 backgroundColor: '#ffffff',
                 color: currentDept.color,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                flexShrink: 0
+                flexShrink: 0,
+                boxShadow: '0 4px 10px rgba(0,0,0,0.15)'
               }}
             >
-              <IconComponent size={24} />
+              <IconComponent size={26} />
             </div>
             <div>
               <h1 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>
@@ -198,44 +205,51 @@ export default function DepartmentLogin() {
           </div>
         </div>
 
-        {/* Department Selector Tabs */}
-        <div
-          style={{
-            display: 'flex',
-            borderBottom: '1px solid #e2e8f0',
-            backgroundColor: '#f8fafc'
-          }}
-        >
-          {Object.values(DEPARTMENTS).map((d) => {
-            const isSelected = selectedDeptId === d.id;
-            const TabIcon = getDeptIcon(d.id);
-            return (
-              <button
-                key={d.id}
-                type="button"
-                onClick={() => handleDepartmentSwitch(d.id)}
-                style={{
-                  flex: 1,
-                  padding: '0.75rem 0.5rem',
-                  border: 'none',
-                  borderBottom: isSelected ? `3px solid ${d.color}` : '3px solid transparent',
-                  backgroundColor: isSelected ? '#ffffff' : 'transparent',
-                  color: isSelected ? d.color : '#64748b',
-                  fontWeight: isSelected ? 700 : 500,
-                  fontSize: '0.75rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '4px',
-                  transition: 'all 0.2s ease'
-                }}
-              >
-                <TabIcon size={16} />
-                <span style={{ whiteSpace: 'nowrap' }}>{d.name.split(' ')[0]}</span>
-              </button>
-            );
-          })}
+        {/* 9 Department Portals Grid Selector */}
+        <div style={{ backgroundColor: '#f8fafc', padding: '1rem 1.5rem', borderBottom: '1px solid #e2e8f0' }}>
+          <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '0.6rem' }}>
+            Select Road Authority Department to Authenticate:
+          </div>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: '0.5rem'
+            }}
+          >
+            {Object.values(DEPARTMENTS).map((d) => {
+              const isSelected = selectedDeptId === d.id;
+              const TabIcon = ICON_MAP[d.icon] || Shield;
+              return (
+                <button
+                  key={d.id}
+                  type="button"
+                  onClick={() => handleDepartmentSwitch(d.id)}
+                  style={{
+                    padding: '0.55rem 0.65rem',
+                    borderRadius: '6px',
+                    border: isSelected ? `2px solid ${d.color}` : '1px solid #e2e8f0',
+                    backgroundColor: isSelected ? '#ffffff' : '#f1f5f9',
+                    color: isSelected ? d.color : '#475569',
+                    fontWeight: isSelected ? 700 : 500,
+                    fontSize: '0.74rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    textAlign: 'left',
+                    boxShadow: isSelected ? '0 2px 6px rgba(0,0,0,0.06)' : 'none',
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  <TabIcon size={14} color={d.color} style={{ flexShrink: 0 }} />
+                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {d.shortName}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Login Body */}
@@ -245,7 +259,7 @@ export default function DepartmentLogin() {
               Departmental Official Authentication
             </h2>
             <p style={{ fontSize: '0.8rem', color: '#64748b', margin: 0 }}>
-              Designated Officer: <strong>{currentDept.officer}</strong>
+              Designated Officer: <strong>{currentDept.officer}</strong> ({currentDept.designation})
             </p>
           </div>
 
@@ -264,35 +278,20 @@ export default function DepartmentLogin() {
                 gap: '0.5rem'
               }}
             >
-              <AlertCircle size={16} flexShrink={0} />
+              <AlertCircle size={16} />
               <span>{error}</span>
             </div>
           )}
 
           <form onSubmit={handleLogin}>
             <div style={{ marginBottom: '1rem' }}>
-              <label
-                style={{
-                  display: 'block',
-                  fontSize: '0.8rem',
-                  fontWeight: 600,
-                  color: '#334155',
-                  marginBottom: '0.4rem'
-                }}
-              >
-                Official Officer ID / Username
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#334155', marginBottom: '0.35rem' }}>
+                Officer Username / ID
               </label>
               <div style={{ position: 'relative' }}>
-                <User
-                  size={16}
-                  style={{
-                    position: 'absolute',
-                    left: '12px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    color: '#94a3b8'
-                  }}
-                />
+                <div style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }}>
+                  <User size={16} />
+                </div>
                 <input
                   type="text"
                   value={username}
@@ -304,57 +303,39 @@ export default function DepartmentLogin() {
                     padding: '0.65rem 0.75rem 0.65rem 2.25rem',
                     border: '1px solid #cbd5e1',
                     borderRadius: '6px',
-                    fontSize: '0.88rem',
-                    outline: 'none',
+                    fontSize: '0.85rem',
                     fontFamily: 'inherit'
                   }}
                 />
               </div>
             </div>
 
-            <div style={{ marginBottom: '1.25rem' }}>
-              <label
-                style={{
-                  display: 'block',
-                  fontSize: '0.8rem',
-                  fontWeight: 600,
-                  color: '#334155',
-                  marginBottom: '0.4rem'
-                }}
-              >
-                Department Security Key / Password
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#334155', marginBottom: '0.35rem' }}>
+                Security Password / Passcode
               </label>
               <div style={{ position: 'relative' }}>
-                <Lock
-                  size={16}
-                  style={{
-                    position: 'absolute',
-                    left: '12px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    color: '#94a3b8'
-                  }}
-                />
+                <div style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }}>
+                  <Lock size={16} />
+                </div>
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder={`Default: ${currentDept.credentials.password}`}
+                  placeholder="Enter passcode or click Instant Demo Login below"
                   required
                   style={{
                     width: '100%',
                     padding: '0.65rem 0.75rem 0.65rem 2.25rem',
                     border: '1px solid #cbd5e1',
                     borderRadius: '6px',
-                    fontSize: '0.88rem',
-                    outline: 'none',
+                    fontSize: '0.85rem',
                     fontFamily: 'inherit'
                   }}
                 />
               </div>
             </div>
 
-            {/* Submit Button */}
             <button
               type="submit"
               disabled={loading}
@@ -380,7 +361,7 @@ export default function DepartmentLogin() {
                 <span>Verifying Department Credentials...</span>
               ) : (
                 <>
-                  <span>Access {currentDept.name} Portal</span>
+                  <span>Access {currentDept.shortName} Portal</span>
                   <ArrowRight size={16} />
                 </>
               )}
@@ -397,7 +378,7 @@ export default function DepartmentLogin() {
             }}
           >
             <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '0.75rem', fontWeight: 500 }}>
-              DEMO EVALUATION CREDENTIALS
+              EVALUATION CREDENTIALS
             </div>
             <div
               style={{
@@ -419,12 +400,12 @@ export default function DepartmentLogin() {
               onClick={() => handleInstantDemoLogin(selectedDeptId)}
               style={{
                 width: '100%',
-                padding: '0.6rem',
+                padding: '0.65rem',
                 backgroundColor: '#f1f5f9',
                 color: '#334155',
                 border: '1px solid #e2e8f0',
                 borderRadius: '6px',
-                fontSize: '0.8rem',
+                fontSize: '0.82rem',
                 fontWeight: 600,
                 cursor: 'pointer',
                 display: 'flex',
@@ -434,7 +415,7 @@ export default function DepartmentLogin() {
               }}
             >
               <Zap size={14} color="#f59e0b" />
-              <span>1-Click Instant Demo Login as {currentDept.name}</span>
+              <span>1-Click Instant Demo Login as {currentDept.shortName}</span>
             </button>
           </div>
         </div>
@@ -447,7 +428,7 @@ export default function DepartmentLogin() {
           fontSize: '0.75rem',
           color: '#94a3b8',
           textAlign: 'center',
-          maxWidth: '480px'
+          maxWidth: '520px'
         }}
       >
         UrbanSight Multi-Agency Authority Dispatch Architecture &copy; 2026.
